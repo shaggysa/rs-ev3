@@ -1,5 +1,5 @@
 [package]
-name = "ev3dev-rust-mindcub3r"
+name = "rs-ev3"
 version = "0.2.0"
 edition = "2024"
 

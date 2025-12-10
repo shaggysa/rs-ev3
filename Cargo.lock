@@ -311,17 +311,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ev3dev-rust-mindcub3r"
-version = "0.2.0"
-dependencies = [
- "ev3dev-lang-rust",
- "pid",
- "scopeguard",
- "smol",
- "tokio",
-]
-
-[[package]]
 name = "event-listener"
 version = "5.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -648,6 +637,17 @@ checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "rs-ev3"
+version = "0.2.0"
+dependencies = [
+ "ev3dev-lang-rust",
+ "pid",
+ "scopeguard",
+ "smol",
+ "tokio",
 ]
 
 [[package]]
