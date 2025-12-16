@@ -5,7 +5,7 @@ use crate::parameters::{Direction, Ev3Result, MotorPort};
 use ev3dev_lang_rust::motors::TachoMotor;
 
 pub struct Motor {
-    motor: TachoMotor,
+    pub(crate) motor: TachoMotor,
 }
 
 impl Motor {
@@ -15,6 +15,10 @@ impl Motor {
             motor.set_polarity("inversed")?;
         }
         Ok(Motor { motor })
+    }
+
+    pub fn get_angle(&self) -> Ev3Result<i32> {
+        Ok(self.motor.get_count_per_rot()? * self.motor.get_full_travel_count()?)
     }
 
     async fn wait_for_stop(&self) -> Ev3Result<()> {
@@ -29,28 +33,40 @@ impl Motor {
         Ok(())
     }
 
-    pub async fn run_angle(&self, angle: i32) -> Ev3Result<()> {
+    pub async fn run_angle(&self, angle: i32, speed: i32) -> Ev3Result<()> {
+        self.motor
+            .set_speed_sp((speed * self.motor.get_count_per_rot()?) / 360);
+
         self.motor.run_to_rel_pos(Some(angle))?;
 
         self.wait_for_stop().await
     }
 
-    pub async fn run_target(&self, target: i32) -> Ev3Result<()> {
+    pub async fn run_target(&self, target: i32, speed: i32) -> Ev3Result<()> {
+        self.motor
+            .set_speed_sp((speed * self.motor.get_count_per_rot()?) / 360);
+
         self.motor.run_to_abs_pos(Some(target))?;
 
         self.wait_for_stop().await
     }
 
-    pub async fn run_time(&self, time: Duration) -> Ev3Result<()> {
+    pub async fn run_time(&self, time: Duration, speed: i32) -> Ev3Result<()> {
+        self.motor
+            .set_speed_sp((speed * self.motor.get_count_per_rot()?) / 360);
+
         self.motor.run_timed(Some(time))?;
 
         self.wait_for_stop().await
     }
 
-    pub async fn run_until_stalled(&self) -> Ev3Result<()> {
+    pub async fn run_until_stalled(&self, speed: i32) -> Ev3Result<()> {
         defer! {
             _ = self.motor.stop()
         }
+
+        self.motor
+            .set_speed_sp((speed * self.motor.get_count_per_rot()?) / 360);
 
         self.motor.run_forever()?;
 
@@ -61,13 +77,16 @@ impl Motor {
         Ok(())
     }
 
-    pub async fn run_while<F>(&self, condition: F) -> Ev3Result<()>
+    pub async fn run_while<F>(&self, speed: i32, condition: F) -> Ev3Result<()>
     where
         F: Fn() -> bool,
     {
         defer! {
             _ = self.motor.stop();
         }
+
+        self.motor
+            .set_speed_sp((speed * self.motor.get_count_per_rot()?) / 360);
 
         self.motor.run_forever()?;
 
